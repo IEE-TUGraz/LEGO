@@ -1765,11 +1765,10 @@ pSummary('--------------- POWER SYSTEM ---------------') = eps ;
 pSummary('Total system demand                  [GWh  ]') = sum[(rp,k)        ,pWeight_rp(rp)*pWeight_k(k)*sum[j, pDemandP (rp,k,j)]] + eps;
 pSummary('Total renewable + storage production [GWh  ]') = sum[(rp,k)        ,pWeight_rp(rp)*pWeight_k(k)*[+ sum[gi(r,j), vGenP.L(rp,k,r)]
                                                                                                            + sum[gi(s,j), vGenP.L(rp,k,s)]]] + eps;
-pSummary('Total renewable curtailment          [GWh  ]') = sum[(rp,k,gi(r,i)),[pResProfile(rp,k,i,r)*pMaxProd(r)*[vGenInvest.l(r)+pExisUnits(r)] - vGenP.l(rp,k,r)]*1e3] + eps ;                                                                                                
+pSummary('Total renewable curtailment          [GWh  ]') = sum[(rp,k,gi(r,i)),pWeight_rp(rp)*pWeight_k(k)*[pResProfile(rp,k,i,r)*pMaxProd(r)*[vGenInvest.l(r)+pExisUnits(r)] - vGenP.l(rp,k,r)]] + eps ;                                                                                                
 pSummary('Total thermal production             [GWh  ]') = sum[(rp,k)        ,pWeight_rp(rp)*pWeight_k(k)*[+ sum[gi(t,j), vGenP.L(rp,k,t)]]] + eps;
 pSummary('Actual green  production             [p.u. ]') = pSummary('Total renewable + storage production [GWh  ]') / pSummary('Total system demand                  [GWh  ]') + eps;
 pSummary('Actual thermal production            [p.u. ]') = pSummary('Total thermal production             [GWh  ]') / pSummary('Total system demand                  [GWh  ]') + eps;
-pSummary('Actual CO2 emissions                 [MtCO2]') = sum[(rp,k,t)      ,pWeight_rp(rp)*pWeight_k(k)*  pCO2Emis(t) * vGenP.L(rp,k,t)] + eps;
 
 pSummary('Thermal            Investment        [GW   ]') = sum[t        , vGenInvest.l (t    ) * pMaxProd(t    )] + eps;
 pSummary('Renewable          Investment        [GW   ]') = sum[r        , vGenInvest.l (r    ) * pMaxProd(r    )] + eps;
