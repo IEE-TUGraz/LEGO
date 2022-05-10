@@ -32,7 +32,7 @@ LEGO input data is organized by sector: electricity (green) and hydrogen (blue).
 
 # How to install LEGO?
 1) If you haven't done so, download GAMS to your computer from https://www.gams.com/download/
-2)	Follow this link: https://github.com/wogrin/LEGO
+2)	Follow this link: https://github.com/IEE-TUGraz/LEGO
 3)	Download the ZIP file using the 'Code' button
 4)	Unzip and keep all files in the same folder
   
