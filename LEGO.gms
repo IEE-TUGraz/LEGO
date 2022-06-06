@@ -726,10 +726,16 @@ eCleanProd..
    + [1-pMinGreenProd]
    * sum[rpk(rp,k),pWeight_rp(rp)*pWeight_k(k)*sum[     j , pDemandP(rp,k,j)]]
 ;
+
+$offFold
+
+$onFold // Firm Supply Constraints  --------------------------------------------
+
 eFirmCapCon..
    + sum[g$ga(g), pFirmCapCoef(g)*pMaxProd(g)*[vGenInvest(g)+pExisUnits(g)]]
    =g= pMinFirmCap*pPeakDemand
 ;
+
 $offFold
 
 $onFold // Rate of Change of Frequency (RoCoF) ---------------------------------
