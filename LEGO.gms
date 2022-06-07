@@ -150,35 +150,36 @@ parameters
    pkWh_Mcal                "conversion factor kWh and Mcal [kWh/Mcal]" / 1.162/
 
 * generation units parameters
-   pEFOR        (g)         "EFOR                           [p.u.]    "
-   pExisUnits   (g)         "existing thermal units         [0-N]     "
-   pMaxProd     (g)         "maximum output                 [GW]      "
-   pMinProd     (g)         "minimum output                 [GW]      "
-   pRampUp      (g)         "ramp up limit                  [GW]      "
-   pRampDw      (g)         "ramp dw limit                  [GW]      "
-   pMaxGenQ     (g)         "maximum reactive power output  [Gvar]    "
-   pMinGenQ     (g)         "minimum reactive power output  [Gvar]    "
-   pMaxCons     (g)         "maximum consumption            [GW]      "
-   pEffic       (g)         "efficiency of the unit         [p.u.]    "
-   pInertiaConst(g)         "inertia constant H             [s]       "
-   pSlopeVarCost(g)         "slope     variable cost        [M$/GWh]  "
-   pInterVarCost(g)         "intercept variable cost        [M$/  h]  "
-   pStartupCost (g)         "startup            cost        [M$]      "
-   pStartupCons (g)         "startup            consumption [GWh]     "
-   pMinReserve  (g)         "minimum reserve                [p.u.]    "
-   pIniReserve  (g)         "initial reserve                [GWh]     "
-   pProdFacRes  (g)         "reservoir production function  [GWh/km3] "
-   pProdFunct   (g)         "hydrogen  production function  [GWh/km3] "
-   pDisEffic    (g)         "discharge  efficiency          [p.u.]    "
-   pChEffic     (g)         "   charge  efficiency          [p.u.]    "
-   pIniUC       (g)         "initial commitment             [0-1]     "
-   pIsHydro     (g)         "hydro unit identifier          [0-1]     "
-   pEnabInv     (g)         "enable investment              [0-1]     "
-   pInvestCost  (g)         "investment cost                [M$/GW/y] "
-   pOMVarCost   (g)         "O&M variable cost              [M$/GWh]  "
-   pMaxInvest   (g)         "maximum investment capacity    [GW]      "
-   pE2PRatio    (g)         "energy to power ratio          [h]       "
-   pFirmCapCoef (g)         "firm capacity contribution     [p.u.]    "
+   pEFOR             (g)         "EFOR                           [p.u.]    "
+   pExisUnits        (g)         "existing thermal units         [0-N]     "
+   pMaxProd          (g)         "maximum output                 [GW]      "
+   pMinProd          (g)         "minimum output                 [GW]      "
+   pRampUp           (g)         "ramp up limit                  [GW]      "
+   pRampDw           (g)         "ramp dw limit                  [GW]      "
+   pMaxGenQ          (g)         "maximum reactive power output  [Gvar]    "
+   pMinGenQ          (g)         "minimum reactive power output  [Gvar]    "
+   pMaxCons          (g)         "maximum consumption            [GW]      "
+   pInertiaConst     (g)         "inertia constant H             [s]       "
+   pSlopeVarCost     (g)         "slope     variable cost        [M$/GWh]  "
+   pInterVarCost     (g)         "intercept variable cost        [M$/  h]  "
+   pStartupCost      (g)         "startup            cost        [M$]      "
+   pSlopeVarFuelCons (g)         "slope variable fuel consumption[p.u.]    "
+   pInterVarCons     (g)         "inter variable consumption     [GWh/h]   "
+   pStartupCons      (g)         "startup            consumption [GWh]     "
+   pMinReserve       (g)         "minimum reserve                [p.u.]    "
+   pIniReserve       (g)         "initial reserve                [GWh]     "
+   pProdFacRes       (g)         "reservoir production function  [GWh/km3] "
+   pProdFunct        (g)         "hydrogen  production function  [GWh/km3] "
+   pDisEffic         (g)         "discharge  efficiency          [p.u.]    "
+   pChEffic          (g)         "   charge  efficiency          [p.u.]    "
+   pIniUC            (g)         "initial commitment             [0-1]     "
+   pIsHydro          (g)         "hydro unit identifier          [0-1]     "
+   pEnabInv          (g)         "enable investment              [0-1]     "
+   pInvestCost       (g)         "investment cost                [M$/GW/y] "
+   pOMVarCost        (g)         "O&M variable cost              [M$/GWh]  "
+   pMaxInvest        (g)         "maximum investment capacity    [GW]      "
+   pE2PRatio         (g)         "energy to power ratio          [h]       "
+   pFirmCapCoef      (g)         "firm capacity contribution     [p.u.]    "
 
 * parameters for modeling demand-side management
    pMaxUpDSM    (rp,k,i,sec) "Bound on demand-side man. up   [GW]      "
@@ -270,7 +271,7 @@ parameters
    
 * CO2 parameters
    pCO2Emis     (g             ) "Specific CO2 emissions per generator           [MtCO2/GWh  ]"
-   pCO2Price                     "CO2-price                                      [M$   /MtCO2]"
+   pCO2Cost                      "CO2-price                                      [M$   /MtCO2]"
    pCO2Budget                    "Total emission budget                          [MtCO2/y    ]"
    pCO2Penalty                   "CO2-penalty for CO2 budget violation           [M$   /MtCO2]"
 
@@ -545,9 +546,11 @@ eTotalVCost..
    + sum[(rpk(rp,k),s        ), pWeight_rp(rp)*pWeight_k(k)*pOMVarCost   (s)     * vGenP        (rp,k,s)    ]
    + sum[(rpk(rp,k),r        ), pWeight_rp(rp)*pWeight_k(k)*pOMVarCost   (r)     * vGenP        (rp,k,r)    ]
 * CO2 operational costs   
-   + sum[(rpk(rp,k),t        ), pWeight_rp(rp)*pWeight_k(k)*pCO2Price*pCO2Emis(t)*pEffic(t)                 * vGenP   (rp,k,t)] $[pEnableCO2]
-   + sum[(rpk(rp,k),t        ), pWeight_rp(rp)             *pCO2Price*pCO2Emis(t)*pEffic(t)*pStartupCons(t) * vStartup(rp,k,t)] $[pEnableCO2] 
-   +                                                        pCO2Penalty          * vCO2Overshoot                                $[pEnableCO2]  
+   +                                                                             pCO2Penalty          * vCO2Overshoot             $[pEnableCO2]
+   + sum[(rpk(rp,k),t        ), pWeight_rp(rp)*pWeight_k(k)*pCO2Cost*pCO2Emis(t)*pStartupCons     (t) * vStartup      (rp,k,t  )] $[pEnableCO2]
+   + sum[(rpk(rp,k),t        ), pWeight_rp(rp)*pWeight_k(k)*pCO2Cost*pCO2Emis(t)*pInterVarCons    (t) * vCommit       (rp,k,t  )] $[pEnableCO2]
+   + sum[(rpk(rp,k),t        ), pWeight_rp(rp)*pWeight_k(k)*pCO2Cost*pCO2Emis(t)*pSlopeVarFuelCons(t) * vGenP         (rp,k,t  )] $[pEnableCO2]
+
 * hydrogen operational costs
    + sum[           h2u       ,                             pH2OMVarCost (h2u)   * vH2Invest    (     h2u      )] $[pEnableH2]
    + sum[(rpk(rp,k),h2i,h2sec), pWeight_rp(rp)*pWeight_k(k)*pH2NSCost            * vH2NS        (rp,k,h2i,h2sec)] $[pEnableH2]
@@ -726,16 +729,10 @@ eCleanProd..
    + [1-pMinGreenProd]
    * sum[rpk(rp,k),pWeight_rp(rp)*pWeight_k(k)*sum[     j , pDemandP(rp,k,j)]]
 ;
-
-$offFold
-
-$onFold // Firm Supply Constraints  --------------------------------------------
-
 eFirmCapCon..
    + sum[g$ga(g), pFirmCapCoef(g)*pMaxProd(g)*[vGenInvest(g)+pExisUnits(g)]]
    =g= pMinFirmCap*pPeakDemand
 ;
-
 $offFold
 
 $onFold // Rate of Change of Frequency (RoCoF) ---------------------------------
@@ -1398,29 +1395,30 @@ pResProfile (rpk(rp,k),i,r) =             tResProfile(k,rp,i,r)         ;
 pResProfile (rpk(rp,k),i,s) =                                      1    ;
 
 * Thermal generation parameters
-pEFOR        (t) = tThermalGen(t,'EFOR'        ) ;
-pEnabInv     (t) = tThermalGen(t,'EnableInvest') ;
-pInertiaConst(t) = tThermalGen(t,'InertiaConst') ;
-pMaxProd     (t) = tThermalGen(t,'MaxProd'     ) * 1e-3 * [1-pEFOR(t)] ;
-pMinProd     (t) = tThermalGen(t,'MinProd'     ) * 1e-3 * [1-pEFOR(t)] ;
-pRampUp      (t) = tThermalGen(t,'RampUp'      ) * 1e-3                ;
-pRampDw      (t) = tThermalGen(t,'RampDw'      ) * 1e-3                ;
-pMaxGenQ     (t) = tThermalGen(t,'Qmax'        ) * 1e-3 ;
-pMinGenQ     (t) = tThermalGen(t,'Qmin'        ) * 1e-3 ;
-pEffic       (t) = tThermalGen(t,'InterVarCost') * 1e-3 * pkWh_Mcal ;
-pSlopeVarCost(t) = tThermalGen(t,'OMVarCost'   ) * 1e-3 +
-                   tThermalGen(t,'SlopeVarCost') * 1e-3 * tThermalGen(t,'FuelCost') ;
-pInterVarCost(t) = tThermalGen(t,'InterVarCost') * 1e-6 * tThermalGen(t,'FuelCost') ;
-pStartupCost (t) = tThermalGen(t,'StartupCost' ) * 1e-6 * tThermalGen(t,'FuelCost') ;
-pStartupCons (t) = tThermalGen(t,'StartupCost' ) * 1e-6 * pkWh_Mcal ;
-pInvestCost  (t) = tThermalGen(t,'InvestCost'  ) * 1e-3 *
-                   pMaxProd   (t               ) ;
-pFirmCapCoef (t) = tThermalGen(t,'FirmCapCoef' ) ;
-pCO2Emis     (t) = tThermalGen(t,'CO2Emis'     ) * 1e-3 ;
+pEFOR             (t) = tThermalGen(t,'EFOR'        ) ;
+pEnabInv          (t) = tThermalGen(t,'EnableInvest') ;
+pInertiaConst     (t) = tThermalGen(t,'InertiaConst') ;
+pMaxProd          (t) = tThermalGen(t,'MaxProd'     ) * 1e-3 * [1-pEFOR(t)] ;
+pMinProd          (t) = tThermalGen(t,'MinProd'     ) * 1e-3 * [1-pEFOR(t)] ;
+pRampUp           (t) = tThermalGen(t,'RampUp'      ) * 1e-3                ;
+pRampDw           (t) = tThermalGen(t,'RampDw'      ) * 1e-3                ;
+pMaxGenQ          (t) = tThermalGen(t,'Qmax'        ) * 1e-3 ;
+pMinGenQ          (t) = tThermalGen(t,'Qmin'        ) * 1e-3 ;
+pSlopeVarCost     (t) = tThermalGen(t,'OMVarCost'   ) * 1e-3 +
+                        tThermalGen(t,'SlopeVarCost') * 1e-3 * tThermalGen(t,'FuelCost') ;
+pInterVarCost     (t) = tThermalGen(t,'InterVarCost') * 1e-6 * tThermalGen(t,'FuelCost') ;
+pStartupCost      (t) = tThermalGen(t,'StartupCost' ) * 1e-6 * tThermalGen(t,'FuelCost') ;
+pSlopeVarFuelCons (t) = tThermalGen(t,'SlopeVarCost') * 1e-3 * pkWh_Mcal ;
+pInterVarCons     (t) = tThermalGen(t,'InterVarCost') * 1e-6 * pkWh_Mcal ;
+pStartupCons      (t) = tThermalGen(t,'StartupCost' ) * 1e-6 * pkWh_Mcal ;
+pInvestCost       (t) = tThermalGen(t,'InvestCost'  ) * 1e-3 *
+                        pMaxProd   (t               ) ;
+pFirmCapCoef      (t) = tThermalGen(t,'FirmCapCoef' ) ;
+pCO2Emis          (t) = tThermalGen(t,'CO2Emis'     ) * 1e-3 ;
 * For the linearization of the RoCoF, the UC variables must have a limit of 1
-pExisUnits   (t) = min[1,tThermalGen(t,'ExisUnits')] ;
-pMaxInvest   (t) $[pExisUnits(t)=1] = 0              ;
-pMaxInvest   (t) $[pExisUnits(t)=0] = 1              ;
+pExisUnits        (t) = min[1,tThermalGen(t,'ExisUnits')] ;
+pMaxInvest        (t) $[pExisUnits(t)=1] = 0              ;
+pMaxInvest        (t) $[pExisUnits(t)=0] = 1              ;
 
 * Storage units parameters
 pExisUnits   (s) = tStorage   (s,'ExisUnits'   )        ;
@@ -1788,7 +1786,11 @@ pSummary('H2     non-supplied                  [t    ]') = sum[(rp,k),pWeight_rp
 
 pSummary('-------------- CO2 EMISSIONS ---------------') = eps ;
 pSummary('Budget CO2 emissions                 [MtCO2]') = pCO2Budget + eps ;
-pSummary('Actual CO2 emissions                 [MtCO2]') = sum[(rp,k,t), pWeight_rp(rp)* pCO2Emis(t)*pEffic(t) * [[pStartupCons(t)*vStartup.l(rp,k,t)] + [pWeight_k(k)*vGenP.l(rp,k,t)]]]$[pEnableCO2] + eps ;
+pSummary('Actual CO2 emissions                 [MtCO2]') = sum[(rpk(rp,k),t), pWeight_rp(rp)*pWeight_k(k)*pCO2Emis(t)
+                                                               *[+(pStartupCons     (t)*vStartup.l(rp,k,t  ))
+                                                                 +(pInterVarCons    (t)*vCommit.l (rp,k,t  ))
+                                                                 +(pSlopeVarFuelCons(t)*vGenP.l   (rp,k,t  ))]]$[pEnableCO2]
+                                                           + eps;
 pSummary('CO2-target overshoot                 [MtCO2]') = vCO2Overshoot.l + eps;
 
 pSummary('----------------- POLICIES -----------------') = eps ;
