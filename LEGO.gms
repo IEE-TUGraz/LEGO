@@ -2015,7 +2015,7 @@ pSummary('Levelized cost of H2                 [$/kg ]') $[pEnableH2 and sum[(rp
                                                                        / sum[(rpk(rp,k),h2u        ), pWeight_rp(rp)*pWeight_k(k)                           * vH2Prod.l   (rp,k,h2u)]
                                                                        + eps ;
 
-display pSummary;
+option pSummary:2:0:1; display pSummary;
 
 $offFold
 
