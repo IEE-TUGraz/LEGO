@@ -1104,17 +1104,22 @@ $onFold // Equation Transmission LineInvestment Order of Circuits --------------
 
 eTranInves (i,j,c) $[lc(i,j,c) and pTransNet and ord(c)>1]..
     vLineInvest(i,j,c) =l= vLineInvest(i,j,c-1) + sum[le(i,j,c-1),1];
-    
-*------- equation CO2 budget -------
+$offFold
+
+$onFold // Equations CO2 budget -------------------------------------------------
 
 eCO2_Budget$[pEnableCO2]..
-   + sum[(rpk(rp,k),t), pWeight_rp(rp)*pWeight_k(k) * pCO2Emis(t) * vGenP(rp,k,t)] + vCO2Undershoot - vCO2Overshoot
+   + sum[(rpk(rp,k),t) , pWeight_rp(rp)*pWeight_k(k) * pCO2Emis  (t)
+                                       *[ pStartupCons     (t) * vStartup     (rp,k,t)
+                                         +pInterVarCons    (t) * vCommit      (rp,k,t)
+                                         +pSlopeVarFuelCons(t) * vGenP        (rp,k,t)]]
+   + vCO2Undershoot - vCO2Overshoot
   =e=
    pCO2Budget
 ;
 $offFold
 
-$onFold // Equation CO2 Budget -------------------------------------------------
+$onFold // Equation Hydrogen Sector -------------------------------------------------
 
 
 eH2_MaxCons(rpk(rp,k),h2g) $[pEnableH2].. vH2Consump(rp,k,h2g) =l=                pH2MaxCons(h2g) *              [vH2Invest (     h2g) + pH2ExisUnits(h2g)] ;
