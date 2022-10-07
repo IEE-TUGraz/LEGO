@@ -48,4 +48,4 @@ Notes:
 * Avoid using spaces or special characters in your file names. 
 
 # References
-[1] [S. Wogrin, D. Tejada-Arango, R. Gaugl, T. Klatzer, U. Bachhiesl, LEGO: The open-source Low-carbon Expansion Generation Optimization model, SoftwareX, Volume 19, 2022, 101141, ISSN 2352-7110.](https://doi.org/10.1016/j.softx.2022.101141)
+[1] S. Wogrin, D. Tejada-Arango, R. Gaugl, T. Klatzer, U. Bachhiesl, (2022). *"LEGO: The open-source Low-carbon Expansion Generation Optimization model,"* SoftwareX, Volume 19, 2022, 101141, ISSN 2352-7110, [https://doi.org/10.1016/j.softx.2022.101141](https://doi.org/10.1016/j.softx.2022.101141).
