@@ -2,7 +2,7 @@
 
 ![LEGO's architecture.](Figures/LEGO_Logo.jpg)
 
-LEGO is a mixed integer quadratically constrained optimization problem and has been designed to be a multi-purpose tool, like a Swiss army knife, that can be employed to study many different aspects of the energy sector. Ranging from short-term unit commitment to long-term generation and transmission expansion planning. The underlying modeling philosophies are: modularity and flexibility. LEGO is also composed of thematic modules that can be added or removed from the model easily via data options depending on the scope of the study. You can use this code freely according to the LICENSE file (https://opensource.org/licenses/MIT), but please cite our paper [[1]](https://doi.org/10.1016/j.softx.2022.101141) if you do.
+LEGO is a mixed integer quadratically constrained optimization problem and has been designed to be a multi-purpose tool, like a Swiss army knife, that can be employed to study many different aspects of the energy sector. Ranging from short-term unit commitment to long-term generation and transmission expansion planning. The underlying modeling philosophies are: modularity and flexibility. LEGO is also composed of thematic modules that can be added or removed from the model easily via data options depending on the scope of the study. You can use this code freely according to the [LICENSE file](https://opensource.org/licenses/MIT), but please cite our paper [[1]](https://doi.org/10.1016/j.softx.2022.101141) if you do.
 
 ![LEGO's architecture.](Figures/LEGO_Module.png)
 
