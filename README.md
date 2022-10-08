@@ -49,4 +49,5 @@ Notes:
 
 # References
 [1] S. Wogrin, D. Tejada-Arango, R. Gaugl, T. Klatzer, U. Bachhiesl, (2022). *"LEGO: The open-source Low-carbon Expansion Generation Optimization model,"* SoftwareX, Volume 19, 101141, ISSN 2352-7110, [https://doi.org/10.1016/j.softx.2022.101141](https://doi.org/10.1016/j.softx.2022.101141).
+
 [2] S. Wogrin, D. Tejada-Arango, S. Delikaraoglou, A. Botterud, (2020). *"Assessing the impact of inertia and reactive power constraints in generation expansion planning,"* Applied Energy, Volume 280, 115925, ISSN 0306-2619, [https://doi.org/10.1016/j.apenergy.2020.115925](https://doi.org/10.1016/j.apenergy.2020.115925).
