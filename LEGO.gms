@@ -43,16 +43,35 @@ $if not set RelaxedMIP  $set RelaxedMIP  "0"
 $if not set EnableSOCP  $set EnableSOCP  "0"
 $if not set RegretCalc  $set RegretCalc  "0"
 
+** optimizer definition
+*option   lp   = cplex ;
+*option  mip   = cplex ;
+*option rmip   = cplex ;
+*option rmiqcp = cplex ;
+*option  miqcp = cplex ;
+*
+** general options
+*option optcr    =   1e-3 ;   // tolerance to solve MIP until IntGap < OptcR
+*option reslim   =   3600 ;   // maximum run time [sec]
+*option threads  =     -1 ;   // number of cores
+*option solprint =    on  ;   // print the final solution in the .lst file
+*option limrow   =    100 ;   // maximum number of equations in the .lst file
+*option limcol   =    100 ;   // maximum number of variables in the .lst file
+*option savepoint=      0 ;   // save into a gdx file solution (0=no save, 1=only the last one, 2=for each solve)
+*
+** profile options
+*option profile=1, profileTol = 0.01 ;
+
 * optimizer definition
-option   lp   = cplex ;
-option  mip   = cplex ;
-option rmip   = cplex ;
-option rmiqcp = cplex ;
-option  miqcp = cplex ;
+option   lp   = gurobi ;
+option  mip   = gurobi ;
+option rmip   = gurobi ;
+option rmiqcp = gurobi ;
+option  miqcp = gurobi ;
 
 * general options
-option optcr    =   1e-3 ;   // tolerance to solve MIP until IntGap < OptcR
-option reslim   =   3600 ;   // maximum run time [sec]
+option optcr    =   1e-2 ;   // tolerance to solve MIP until IntGap < OptcR
+option reslim   =  43200 ;   // maximum run time [sec]
 option threads  =     -1 ;   // number of cores
 option solprint =    on  ;   // print the final solution in the .lst file
 option limrow   =    100 ;   // maximum number of equations in the .lst file
@@ -187,7 +206,7 @@ parameters
    pDSMShiftCost(rp,k,i)     "Cost of shifting DSM           [M$/GWh]  "
    pDSMShedCost (seg   )     "Cost of price-responsive DSM   [M$/GWh]  "
    pDSMShedRatio(seg   )     "Percentage of shedding DSM     [p.u.]    "
-   pDelayTime   (sec,rp)     "Delay time for DSM shifting    [h]       "
+   pDSMDelayTime(sec,rp)     "Delay time for DSM shifting    [h]       "
 
 * parameters for cycle aging cost of batteries
    pReplaceCost (  g  )     "Battery cell replacement cost  [M$/GWh]     "
@@ -1175,8 +1194,17 @@ $offFold
 *-------------------------------------------------------------------------------
 $onFold // Options for Solvers -------------------------------------------------
 
+*file     GOPT / gurobi.opt /               ;
+*put      GOPT / 'IIS 1'    / 'rins 1000' / ;
+*putclose GOPT
+*;
+*file     COPT / cplex.opt  /                   ;
+*put      COPT / 'IIS yes'  / 'rinsheur 1000' / ;
+*putclose COPT
+*;
+
 file     GOPT / gurobi.opt /               ;
-put      GOPT / 'IIS 1'    / 'rins 1000' / ;
+put      GOPT / 'IIS 1'    / 'rins 1000' / 'nodefilestart 0.5' ;
 putclose GOPT
 ;
 file     COPT / cplex.opt  /                   ;
@@ -1283,7 +1311,7 @@ $include tmp_businfo.txt
 table    tFACTS       (g,*     )
 $include tmp_facts.txt
 ;
-table    tDelayTime   (sec,rp    )
+table    tDSMDelayTime(sec,rp    )
 $include tmp_dsmdelaytime.txt
 ;
 table    tDSMprofile  (k,rp,sec,*)
@@ -1514,11 +1542,11 @@ pDemandQ(rpk(rp,k),i) = tDemand(k,rp,i) * pRatioDemQP(i) * 1e-3 ;
 pPeakDemand           = smax((rp,k)$rpk(rp,k),sum(i,pDemandP(rp,k,i)));
 
 * demand-side management
-pMaxUpDSM(rpk(rp,k),i,sec) = tDSMprofile(k,rp,sec,'Up')   * tDemand(k,rp,i) * 1e-3 ;
-pMaxDnDSM(rpk(rp,k),i,sec) = tDSMprofile(k,rp,sec,'Down') * tDemand(k,rp,i) * 1e-3 ;
-pDSMShedCost (seg)         = tDSMshed(seg,'ShedPenalty'   )                 * 1e-3 ;
-pDSMShedRatio(seg)         = tDSMshed(seg,'ShedPercentage')                        ;
-pDelayTime   (sec,rp     ) = tDelayTime(sec,rp)                                    ;
+pMaxUpDSM(rpk(rp,k),i,sec) = tDSMprofile  (k,rp,sec,'Up'       ) * tDemand(k,rp,i) * 1e-3 ;
+pMaxDnDSM(rpk(rp,k),i,sec) = tDSMprofile  (k,rp,sec,'Down'     ) * tDemand(k,rp,i) * 1e-3 ;
+pDSMShedCost (seg)         = tDSMshed     (seg,'ShedPenalty'   )                   * 1e-3 ;
+pDSMShedRatio(seg)         = tDSMshed     (seg,'ShedPercentage')                          ;
+pDSMDelayTime(sec,rp     ) = tDSMDelayTime(sec,rp              )                          ;
 
 * DSM subset
 dsm(rp,k,kk,sec) = no ;
@@ -1526,14 +1554,14 @@ dsm(rp,k,kk,sec) = no ;
 loop[(rp,k,kk,sec),
     if [ord(k) <> ord(kk),
         if   [ord(k) - ord(kk) > 0,
-                if[ord(k) - ord(kk) <= pDelayTime(sec,rp),
+                if[ord(k) - ord(kk) <= pDSMDelayTime(sec,rp),
                     dsm(rp,k,kk,sec) = yes];
         else
              if[ord(k) - ord(kk) <= -12,
-                if[24 - (ord(kk) - ord(k)) <= pDelayTime(sec,rp),
+                if[24 - (ord(kk) - ord(k)) <= pDSMDelayTime(sec,rp),
                     dsm(rp,k,kk,sec) = yes];
              else
-                if[ord(kk) - ord(k) <= pDelayTime(sec,rp),
+                if[ord(kk) - ord(k) <= pDSMDelayTime(sec,rp),
                     dsm(rp,k,kk,sec) = yes];
                 ]
              ]
