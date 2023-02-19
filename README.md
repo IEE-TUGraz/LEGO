@@ -17,7 +17,8 @@ Its unique temporal structure allows LEGO to function with either chronological 
 # Software Architecture
 The LEGO code runs entirely in GAMS (using MIQCP solvers such as CPLEX or Gurobi). Data and results are read from / exported to Excel via gdx as indicated in the figure below:
 
-![LEGO's architecture.](Figures/LEGO_SoftwareArchitecture.png)
+![LEGO's architecture.](Figures/LEGO_SoftwareArchitecture.png#gh-light-mode-only)
+![LEGO's architecture.](Figures/LEGO_SoftwareArchitecture_DarkMode.png#gh-dark-mode-only)
 
 # Input Data
 LEGO input data is organized by sector: electricity (green) and hydrogen (blue). A more detailed description of LEGO's input data organized in Excel Sheets can be found below:
