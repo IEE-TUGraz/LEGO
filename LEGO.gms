@@ -434,8 +434,10 @@ equations
    eStMaxCons    (rp,k,g    )  "maximum consumption considering investment   [GWh]"
    eStMaxIntraRes(rp,k,g    )  "maximum storage level considering investment [GWh]"
    eStMinIntraRes(rp,k,g    )  "minimum storage level considering investment [GWh]"
+   eStFinIntraRes(rp,k,g    )  "final   storage level considering investment [GWh]"
    eStMaxInterRes( p,  g    )  "maximum storage level considering investment [GWh]"
    eStMinInterRes( p,  g    )  "minimum storage level considering investment [GWh]"
+   eStFinInterRes( p,  g    )  "final   storage level considering investment [GWh]"
 * renewable energy constraints
    eReMaxProd    (rp,k,g    )  "maximum production considering investment    [GW ]"
 *  equations for DSM
@@ -698,12 +700,12 @@ $offFold
 $onFold // Storage Units Constraints -------------------------------------------
 
 eStIntraRes(rpk(rp,k),   s) $[[card(rp)=1] or [card(rp)>1 and not pIsHydro(s)] and not cdsf(s)]..
-   + vStIntraRes(rp,k--1,s) $[ card(rp)>1             ]
-   + vStIntraRes(rp,k- 1,s) $[ card(rp)=1             ]
-   + pIniReserve(        s) $[ card(rp)=1 and ord(k)=1]
+   + vStIntraRes(rp,k--1,s) $[ card(rp)>1]
+   + vStIntraRes(rp,k- 1,s) $[ card(rp)=1]
+   + pIniReserve(        s) *[vGenInvest(s)+pExisUnits(s)]$[card(rp)=1 and ord(k)=1]
    - vStIntraRes(rp,k   ,s)
-   - vSpillag   (rp,k   ,s)                $[pIsHydro (s)]
-   + pInflows   (rp,k   ,s) * pWeight_k(k) $[pIsHydro (s)]
+   - vSpillag   (rp,k   ,s)                               $[pIsHydro (s)]
+   + pInflows   (rp,k   ,s) *[vGenInvest(s)+pExisUnits(s)]$[pIsHydro (s)]
    - vGenP      (rp,k   ,s) * pWeight_k(k) / pDisEffic(s)
    + vConsump   (rp,k   ,s) * pWeight_k(k) * pChEffic (s)
    + vWaterSell (rp,k   ,s) $[pRegretCalc and pIsHydro(s)]
@@ -711,14 +713,14 @@ eStIntraRes(rpk(rp,k),   s) $[[card(rp)=1] or [card(rp)>1 and not pIsHydro(s)] a
    0
 ;
 
-eStInterRes     (p         ,s) $[[card(rp)>1] and [mod(ord(p),pMovWind)=0]]..
+eStInterRes     (p         ,s) $[[card(rp)>1] and [mod(ord(p),pMovWind)=0] and pIsHydro(s)]..
    + vStInterRes(p-pMovWind,s)
-   + pIniReserve(           s) $[ord(p)=pMovWind]
+   + pIniReserve(           s) *[vGenInvest(s)+pExisUnits(s)]$[ord(p)=pMovWind]
    - vStInterRes(p         ,s)
    + sum[hindex(pp,rpk(rp,k))$[[ord(pp)>  ord(p)-pMovWind] and
                               [ ord(pp)<= ord(p)         ]],
-        - vSpillag (rp,k,s)                $[pIsHydro (s)]
-        + pInflows (rp,k,s) * pWeight_k(k) $[pIsHydro (s)]
+        - vSpillag (rp,k,s)                               $[pIsHydro (s)]
+        + pInflows (rp,k,s) *[vGenInvest(s)+pExisUnits(s)]$[pIsHydro (s)]
         - vGenP    (rp,k,s) * pWeight_k(k) / pDisEffic(s)
         + vConsump (rp,k,s) * pWeight_k(k) * pChEffic (s)
         ]
@@ -729,11 +731,13 @@ eStInterRes     (p         ,s) $[[card(rp)>1] and [mod(ord(p),pMovWind)=0]]..
 eStMaxProd    (rpk(rp,k),s).. vGenP(rp,k,s) - vConsump(rp,k,s) + v2ndResUP(rp,k,s) =l=  pMaxProd(s)*[vGenInvest(s)+ pExisUnits(s)] ;
 eStMaxCons    (rpk(rp,k),s).. vGenP(rp,k,s) - vConsump(rp,k,s) - v2ndResDW(rp,k,s) =g= -pMaxCons(s)*[vGenInvest(s)+ pExisUnits(s)] ;
 
-eStMaxIntraRes(rpk(rp,k),s).. vStIntraRes(rp,k,s) =l= pMaxProd(s)*[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s)                  - [v2ndResDW(rp,k,s)+v2ndResDW(rp,k--1,s)] * pWeight_k(k) ;
-eStMinIntraRes(rpk(rp,k),s).. vStIntraRes(rp,k,s) =g= pMaxProd(s)*[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s) * pMinReserve(s) + [v2ndResUP(rp,k,s)+v2ndResUP(rp,k--1,s)] * pWeight_k(k) ;
+eStMaxIntraRes(rpk(rp,k),s)..                                 vStIntraRes(rp,k,s) =l= pMaxProd(s)    *[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s)                  - [v2ndResDW(rp,k,s)+v2ndResDW(rp,k--1,s)] * pWeight_k(k) ;
+eStMinIntraRes(rpk(rp,k),s)..                                 vStIntraRes(rp,k,s) =g= pMaxProd(s)    *[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s) * pMinReserve(s) + [v2ndResUP(rp,k,s)+v2ndResUP(rp,k--1,s)] * pWeight_k(k) ;
+eStFinIntraRes(rpk(rp,k),s)$[card(rp)=1 and ord(k)=card(k)].. vStIntraRes(rp,k,s) =g= pIniReserve(s) *[vGenInvest(s)+pExisUnits(s)] ;
 
-eStMaxInterRes(p,s)$[mod(ord(p),pMovWind)=0].. vStInterRes(p,s) =l= pMaxProd(s)*[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s)                 ;
-eStMinInterRes(p,s)$[mod(ord(p),pMovWind)=0].. vStInterRes(p,s) =g= pMaxProd(s)*[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s) * pMinReserve(s);
+eStMaxInterRes(p,s)$[card(rp)>1 and mod(ord(p),pMovWind)=0 and pIsHydro(s)].. vStInterRes(p,s)    =l= pMaxProd(s)    *[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s)                 ;
+eStMinInterRes(p,s)$[card(rp)>1 and mod(ord(p),pMovWind)=0 and pIsHydro(s)].. vStInterRes(p,s)    =g= pMaxProd(s)    *[vGenInvest(s)+pExisUnits(s)] * pE2PRatio(s) * pMinReserve(s);
+eStFinInterRes(p,s)$[card(rp)>1 and ord(p)=card(p)         and pIsHydro(s)].. vStInterRes(p,s)    =g= pIniReserve(s) *[vGenInvest(s)+pExisUnits(s)] ;
 
 $offFold
 
@@ -742,13 +746,13 @@ $onFold // Renewable Energy Constraints ----------------------------------------
 eReMaxProd(rpk(rp,k),r)..
    + vGenP(rp,k,r) =l= sum[gi(r,i),[pMaxProd(r)*[vGenInvest(r)+pExisUnits(r)]]*pResProfile(rp,k,i,r)]
 ;
-eCleanProd..
+eCleanProd$[pMinGreenProd]..
    + sum[rpk(rp,k),pWeight_rp(rp)*pWeight_k(k)*sum[gi(t,j), vGenP   (rp,k,t)]]
   =l=
    + [1-pMinGreenProd]
    * sum[rpk(rp,k),pWeight_rp(rp)*pWeight_k(k)*sum[     j , pDemandP(rp,k,j)]]
 ;
-eFirmCapCon..
+eFirmCapCon$[pMinFirmCap]..
    + sum[g$ga(g), pFirmCapCoef(g)*pMaxProd(g)*[vGenInvest(g)+pExisUnits(g)]]
    =g= pMinFirmCap*pPeakDemand
 ;
@@ -1632,23 +1636,23 @@ vDSM_Up.fx    (rpk(rp,k),i,sec)$[not pDSM] =  0;
 vDSM_Dn.fx    (rpk(rp,k),i,sec)$[not pDSM] =  0;
 vDSM_Shed.fx  (rpk(rp,k),i,seg)$[not pDSM] =  0;
 
-vStIntraRes.up(rpk(rp,k),s) =  pE2PRatio (s) *
+* spillage variable only for hydro units
+vSpillag.fx(rpk(rp,k),s) $[pIsHydro(s)=0] = 0 ;
+                             
+vSpillag.up   (rpk(rp,k),s) =  pE2PRatio (s) *
+                               pMaxProd  (s) *[pMaxInvest (s)+pExisUnits(s)]
+                             - pE2PRatio (s) * pMinReserve(s)*
                                pMaxProd  (s) *[pMaxInvest (s)+pExisUnits(s)] ;
-vStIntraRes.lo(rpk(rp,k),s) =  pE2PRatio (s) * pMinReserve(s)*
+                               
+vWaterSell.up (rpk(rp,k),s) =  pE2PRatio (s) *
+                               pMaxProd  (s) *[pMaxInvest (s)+pExisUnits(s)]
+                             - pE2PRatio (s) * pMinReserve(s)*
                                pMaxProd  (s) *[pMaxInvest (s)+pExisUnits(s)] ;
 
 vCDSF_dis.up  (rpk(rp,k),s,a) $[cdsf(s)] = pMaxProd (s) *[pMaxInvest(s)+pExisUnits(s)] ;
 vCDSF_ch.up   (rpk(rp,k),s,a) $[cdsf(s)] = pMaxCons (s) *[pMaxInvest(s)+pExisUnits(s)] ;
 vCDSF_SoC.up  (rpk(rp,k),s,a) $[cdsf(s)] = pE2PRatio(s) *
                                            pMaxCons (s) *[pMaxInvest(s)+pExisUnits(s)] ;
-
-vSpillag.up   (rpk(rp,k),s) =  vStIntraRes.up(rp,k,s) -
-                               vStIntraRes.lo(rp,k,s) ;
-vWaterSell.up (rpk(rp,k),s) =  vStIntraRes.up(rp,k,s) -
-                               vStIntraRes.lo(rp,k,s) ;
-
-vStInterRes.up(p,s) $[mod(ord(p),pMovWind)=0] = pMaxProd(s)*[pMaxInvest(s)+pExisUnits(s)]*pE2PRatio(s)                ;
-vStInterRes.lo(p,s) $[mod(ord(p),pMovWind)=0] = pMaxProd(s)*[pMaxInvest(s)+pExisUnits(s)]*pE2PRatio(s)*pMinReserve(s) ;
 
 vLineP.up   (rpk(rp,k),i,j,c) $[le(i,j,c)]  =  pPmax (i,j,c) ;
 vLineP.lo   (rpk(rp,k),i,j,c) $[le(i,j,c)]  = -pPmax (i,j,c) ;
@@ -1687,13 +1691,6 @@ vRoCoF_SG_M.up(rpk(rp,k)       )$[pEnableRoCoF] =  pUBLin  ;
 vRoCoF_VI_M.up(rpk(rp,k)       )$[pEnableRoCoF] =  pUBLin  ;
 vRoCoF_AuxZ.up(rpk(rp,k),t     )$[pEnableRoCoF] =  pUBLin  ;
 vRoCoF_AuxV.up(rpk(rp,k),v,   m)$[pEnableRoCoF] =  pUBLin  ;
-
-* last hour condition for storage
-vStIntraRes.fx(rpk(rp,k),s) $[card(rp)=1 and ord(k)=card(k)] = pIniReserve(s) ;
-vStInterRes.fx( p       ,s) $[card(rp)>1 and ord(p)=card(p)] = pIniReserve(s) ;
-
-* spillage variable only for hydro units
-vSpillag.fx(rpk(rp,k),s) $[pIsHydro(s)=0] = 0 ;
 
 * bounds on variables for single node case
 if(card(i)=1,
