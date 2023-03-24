@@ -1859,8 +1859,7 @@ pStLvMW  (p,s   ) $[[card(rp)=1] and [    pIsHydro(s)] and [mod(ord(p),pMovWind)
 pStLvMW  (p,s   ) $[[card(rp)>1] and [    pIsHydro(s)] and [mod(ord(p),pMovWind)=0]] =                          vStInterRes.l( p  ,s)  + eps ;
 
 pLineP(k,i,j,c,rp) $[rpk(rp,k) and la(i,j,c) and not pTransNet                    ] =                               eps ;
-pLineP(k,i,j,c,rp) $[rpk(rp,k) and la(i,j,c) and     pTransNet                    ] =  vLineP.l(rp,k,i,j,c) * 1e3 + eps ;
-pLineP(k,j,i,c,rp) $[rpk(rp,k) and la(i,j,c) and     pTransNet and not pEnableSOCP] = -vLineP.l(rp,k,i,j,c) * 1e3 + eps ;
+pLineP(k,i,j,c,rp) $[rpk(rp,k) and la(i,j,c) and     pTransNet and not pEnableSOCP] =  vLineP.l(rp,k,i,j,c) * 1e3 + eps ;
 pLineP(k,j,i,c,rp) $[rpk(rp,k) and la(i,j,c) and     pTransNet and     pEnableSOCP] =  vLineP.l(rp,k,j,i,c) * 1e3 + eps ;
 pLineQ(k,i,j,c,rp) $[rpk(rp,k) and la(i,j,c) and not pTransNet                    ] =                               eps ;
 pLineQ(k,i,j,c,rp) $[rpk(rp,k) and la(i,j,c) and     pTransNet and not pEnableSOCP] =                               eps ;
