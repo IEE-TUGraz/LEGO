@@ -1555,7 +1555,7 @@ pDSMDelayTime(sec,rp     ) = tDSMDelayTime(sec,rp              )                
 * DSM subset
 dsm(rp,k,kk,sec) = no ;
 
-loop[(rp,k,kk,sec),
+loop[(rp,k,kk,sec)$[pDSM],
     if [ord(k) <> ord(kk),
         if   [ord(k) - ord(kk) > 0,
                 if[ord(k) - ord(kk) <= pDSMDelayTime(sec,rp),
