@@ -1203,7 +1203,7 @@ $onFold // Options for Solvers -------------------------------------------------
 *putclose GOPT
 *;
 *file     COPT / cplex.opt  /                   ;
-*put      COPT / 'IIS yes'  / 'rinsheur 1000' / ;
+*put      COPT / 'IIS 1'  / 'rinsheur 1000' / ;
 *putclose COPT
 *;
 
@@ -1212,7 +1212,7 @@ put      GOPT / 'IIS 1'    / 'rins 1000' / 'nodefilestart 0.5' ;
 putclose GOPT
 ;
 file     COPT / cplex.opt  /                   ;
-put      COPT / 'IIS yes'  / 'rinsheur 1000' / ;
+put      COPT / 'IIS 1'  / 'rinsheur 1000' / ;
 putclose COPT
 ;
 $offFold
