@@ -722,7 +722,7 @@ eStInterRes     (p         ,s) $[[card(rp)>1] and [mod(ord(p),pMovWind)=0] and p
         - vSpillag (rp,k,s)                               $[pIsHydro (s)]
         + pInflows (rp,k,s) *[vGenInvest(s)+pExisUnits(s)]$[pIsHydro (s)]
         - vGenP    (rp,k,s) * pWeight_k(k) / pDisEffic(s)
-        + vConsump (rp,k,s) * pWeight_k(k) * pChEffic (s)
+        + vConsump (rp,k,s) * pWeight_k(k) * pChEffic (s) $[pMaxCons(s)]
         ]
   =e=
    0
@@ -1626,7 +1626,7 @@ vGenQ.lo      (rpk(rp,k),ga(g)) =  pMinGenQ  (g)              ;
 
 vGenP.up      (rpk(rp,k),s) =  pMaxProd  (s) *[pMaxInvest(s)+pExisUnits(s)];
 v2ndResUP.up  (rpk(rp,k),s) =  pMaxProd  (s) *[pMaxInvest(s)+pExisUnits(s)];
-vConsump.up   (rpk(rp,k),s) =  pMaxProd  (s) *[pMaxInvest(s)+pExisUnits(s)];
+vConsump.up   (rpk(rp,k),s) =  pMaxCons  (s) *[pMaxInvest(s)+pExisUnits(s)];
 v2ndResDW.up  (rpk(rp,k),s) =  pMaxProd  (s) *[pMaxInvest(s)+pExisUnits(s)];
 
 vDSM_Up.up    (rpk(rp,k),i,sec)$[    pDSM] =  pMaxUpDSM (rp,k,i,sec);
@@ -1693,7 +1693,7 @@ vRoCoF_AuxZ.up(rpk(rp,k),t     )$[pEnableRoCoF] =  pUBLin  ;
 vRoCoF_AuxV.up(rpk(rp,k),v,   m)$[pEnableRoCoF] =  pUBLin  ;
 
 * bounds on variables for single node case
-if(card(i)=1,
+if(card(i)=1 or pTransNet=0,
    vPNS.up     (rpk(rp,k),is)             = sum[j, pDemandP(rp,k,j)] ;
    vPNS.fx     (rpk(rp,k),i ) $[not is(i)]= 0                        ;
 
