@@ -1922,12 +1922,12 @@ $offFold
 $onFold // Economic Results Calculation ----------------------------------------
 
 * electricity prices [$/MWh]
-pSRMC(p,i)$[not pTransNet                    ] = sum[hindex(p,rpk(rp,k)), eSN_BalanceP.m  (rp,k,i) * 1e3 / [pWeight_rp(rp)*pWeight_k(k)]] + eps ;
+pSRMC(p,i)$[not pTransNet and iact(i)        ] = sum[hindex(p,rpk(rp,k)), eSN_BalanceP.m  (rp,k,i) * 1e3 / [pWeight_rp(rp)*pWeight_k(k)]] + eps ;
 pSRMC(p,i)$[    pTransNet and not pEnableSOCP] = sum[hindex(p,rpk(rp,k)), eDC_BalanceP.m  (rp,k,i) * 1e3 / [pWeight_rp(rp)*pWeight_k(k)]] + eps ;
 pSRMC(p,i)$[    pTransNet and     pEnableSOCP] = sum[hindex(p,rpk(rp,k)), eSOCP_BalanceP.m(rp,k,i) * 1e3 / [pWeight_rp(rp)*pWeight_k(k)]] + eps ;
 
 * electricity prices in rp and k [M$/GW]
-pMC(rp,k,i)$[not pTransNet                    ] = eSN_BalanceP.m  (rp,k,i) + eps ;
+pMC(rp,k,i)$[not pTransNet and iact(i)        ] = eSN_BalanceP.m  (rp,k,i) + eps ;
 pMC(rp,k,i)$[    pTransNet and not pEnableSOCP] = eDC_BalanceP.m  (rp,k,i) + eps ;
 pMC(rp,k,i)$[    pTransNet and     pEnableSOCP] = eSOCP_BalanceP.m(rp,k,i) + eps ;
 
@@ -1936,12 +1936,12 @@ pInertDual(k,rp) $[rpk(rp,k) and     pEnableRoCoF] = eRoCoF_SyEq1.m(rp,k) * 1e6 
 pInertDual(k,rp) $[rpk(rp,k) and not pEnableRoCoF] = eMinInertia.m (rp,k) * 1e6 + eps ;
 
 * new calculations for economic results (revenues, costs, profits, etc)
-pRevSpot (g)$[not pTransNet                    ]  = + sum[(rpk(rp,k)), vGenP.l   (rp,k,g) * sum[i$gi(g,i), eSN_BalanceP.m(rp,k,i)]];
+pRevSpot (g)$[not pTransNet                    ]  = + sum[(rpk(rp,k)), vGenP.l   (rp,k,g) * sum[iact(i),   eSN_BalanceP.m(rp,k,i)]];
 pRevSpot (g)$[    pTransNet and not pEnableSOCP]  = + sum[(rpk(rp,k)), vGenP.l   (rp,k,g) * sum[i$gi(g,i), eDC_BalanceP.m(rp,k,i)]];
 pRevSpot (g)$[    pTransNet and     pEnableSOCP]  = + sum[(rpk(rp,k)), vGenP.l   (rp,k,g) * sum[i$gi(g,i), eSOCP_BalanceP.m(rp,k,i)]];
 
 * only storage units can buy energy on spot market
-pCostSpot (s)$[not pTransNet                    ] = + sum[(rpk(rp,k)), vConsump.l(rp,k,s) * sum[i$gi(s,i), eSN_BalanceP.m(rp,k,i)]];
+pCostSpot (s)$[not pTransNet                    ] = + sum[(rpk(rp,k)), vConsump.l(rp,k,s) * sum[iact(i),   eSN_BalanceP.m(rp,k,i)]];
 pCostSpot (s)$[    pTransNet and not pEnableSOCP] = + sum[(rpk(rp,k)), vConsump.l(rp,k,s) * sum[i$gi(s,i), eDC_BalanceP.m(rp,k,i)]];
 pCostSpot (s)$[    pTransNet and     pEnableSOCP] = + sum[(rpk(rp,k)), vConsump.l(rp,k,s) * sum[i$gi(s,i), eSOCP_BalanceP.m(rp,k,i)]];
 
