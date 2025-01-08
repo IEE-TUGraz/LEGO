@@ -43,35 +43,16 @@ $if not set RelaxedMIP  $set RelaxedMIP  "0"
 $if not set EnableSOCP  $set EnableSOCP  "0"
 $if not set RegretCalc  $set RegretCalc  "0"
 
-** optimizer definition
-*option   lp   = cplex ;
-*option  mip   = cplex ;
-*option rmip   = cplex ;
-*option rmiqcp = cplex ;
-*option  miqcp = cplex ;
-*
-** general options
-*option optcr    =   1e-3 ;   // tolerance to solve MIP until IntGap < OptcR
-*option reslim   =   3600 ;   // maximum run time [sec]
-*option threads  =     -1 ;   // number of cores
-*option solprint =    on  ;   // print the final solution in the .lst file
-*option limrow   =    100 ;   // maximum number of equations in the .lst file
-*option limcol   =    100 ;   // maximum number of variables in the .lst file
-*option savepoint=      0 ;   // save into a gdx file solution (0=no save, 1=only the last one, 2=for each solve)
-*
-** profile options
-*option profile=1, profileTol = 0.01 ;
-
 * optimizer definition
-option   lp   = gurobi ;
-option  mip   = gurobi ;
-option rmip   = gurobi ;
-option rmiqcp = gurobi ;
-option  miqcp = gurobi ;
+option   lp   = cplex ;
+option  mip   = cplex ;
+option rmip   = cplex ;
+option rmiqcp = cplex ;
+option  miqcp = cplex ;
 
 * general options
-option optcr    =   1e-2 ;   // tolerance to solve MIP until IntGap < OptcR
-option reslim   =  43200 ;   // maximum run time [sec]
+option optcr    =   1e-3 ;   // tolerance to solve MIP until IntGap < OptcR
+option reslim   =   3600 ;   // maximum run time [sec]
 option threads  =     -1 ;   // number of cores
 option solprint =    on  ;   // print the final solution in the .lst file
 option limrow   =    100 ;   // maximum number of equations in the .lst file
@@ -80,6 +61,25 @@ option savepoint=      0 ;   // save into a gdx file solution (0=no save, 1=only
 
 * profile options
 option profile=1, profileTol = 0.01 ;
+
+** optimizer definition
+*option   lp   = gurobi ;
+*option  mip   = gurobi ;
+*option rmip   = gurobi ;
+*option rmiqcp = gurobi ;
+*option  miqcp = gurobi ;
+*
+** general options
+*option optcr    =   1e-2 ;   // tolerance to solve MIP until IntGap < OptcR
+*option reslim   =  43200 ;   // maximum run time [sec]
+*option threads  =     -1 ;   // number of cores
+*option solprint =    on  ;   // print the final solution in the .lst file
+*option limrow   =    100 ;   // maximum number of equations in the .lst file
+*option limcol   =    100 ;   // maximum number of variables in the .lst file
+*option savepoint=      0 ;   // save into a gdx file solution (0=no save, 1=only the last one, 2=for each solve)
+*
+** profile options
+*option profile=1, profileTol = 0.01 ;
 
 $offFold
 
